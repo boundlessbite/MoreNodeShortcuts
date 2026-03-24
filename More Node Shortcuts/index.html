@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>More Node Shortcuts - Plugin Documentation</title>
+    <style>
+        :root {
+            --primary-color: #4daafc;
+            --primary-hover: #2b8ce0;
+            --text-color: #e0e0e0;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --border-color: #333333;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #1a1a1a;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 4px solid var(--primary-color);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        header p {
+            margin: 5px 0 0 0;
+            color: #cccccc;
+            font-size: 1rem;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        /* Sidebar Styling */
+        aside.sidebar {
+            width: 260px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 40px;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            border: 1px solid var(--border-color);
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+
+        aside.sidebar h3 {
+            margin-top: 0;
+            color: #fff;
+            font-size: 1.1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        aside.sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        aside.sidebar ul li {
+            margin-bottom: 8px;
+        }
+
+        aside.sidebar ul li ul {
+            padding-left: 15px;
+            margin-top: 5px;
+            border-left: 1px solid var(--border-color);
+            margin-left: 5px;
+        }
+
+        aside.sidebar a {
+            color: #aaaaaa;
+            text-decoration: none;
+            font-size: 0.95rem;
+            display: block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        aside.sidebar a:hover {
+            color: #ffffff;
+            background-color: rgba(77, 170, 252, 0.1);
+        }
+
+        /* Scrollbar customization for sidebar */
+        aside.sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+        aside.sidebar::-webkit-scrollbar-thumb {
+            background-color: #444;
+            border-radius: 4px;
+        }
+
+        /* Main Content Styling */
+        main {
+            flex-grow: 1;
+            min-width: 0;
+            background-color: var(--card-bg);
+            padding: 40px 50px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            border: 1px solid var(--border-color);
+        }
+
+        h2, h3 {
+            scroll-margin-top: 40px;
+        }
+
+        h2 {
+            color: #ffffff;
+            margin-top: 45px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            font-size: 1.75rem;
+        }
+
+        main h3 {
+            color: var(--primary-color);
+            margin-top: 35px;
+            font-size: 1.25rem;
+        }
+
+        /* Images inside content */
+        main img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #444444;
+            border-radius: 6px;
+            margin: 25px 0;
+            display: block;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            cursor: zoom-in; /* Indicate image is clickable */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        main img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(77, 170, 252, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        /* Modal / Lightbox Styling */
+        #image-modal {
+            display: none; 
+            position: fixed; 
+            z-index: 9999; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: hidden; 
+            background-color: rgba(0, 0, 0, 0.85); 
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        #image-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            object-fit: contain;
+            cursor: zoom-in;
+            transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* Zoomed-in state (Panning Cursors) */
+        .modal-content.zoomed {
+            cursor: grab;
+        }
+        
+        .modal-content.zoomed:active {
+            cursor: grabbing;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            color: #ffffff;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+            z-index: 10000;
+        }
+
+        .close-modal:hover,
+        .close-modal:focus {
+            color: var(--primary-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Other elements */
+        code {
+            background: #2b2b2b;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+            color: #ff8fb8;
+            border: 1px solid #404040;
+        }
+
+        ul.content-list, ol.content-list {
+            padding-left: 25px;
+        }
+
+        .content-list li {
+            margin-bottom: 10px;
+        }
+
+        .note {
+            background: #0d2b4d;
+            border-left: 5px solid var(--primary-color);
+            padding: 15px 20px;
+            margin: 25px 0;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.95em;
+        }
+
+        .warning {
+            background: #422a04;
+            border-left: 5px solid #f59e0b;
+            padding: 15px 20px;
+            margin: 25px 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .warning strong {
+            color: #fbbf24;
+        }
+
+        .img-fallback {
+            background-color: #1a1a1a;
+            border: 2px dashed #555;
+            padding: 40px;
+            text-align: center;
+            color: #aaaaaa;
+            border-radius: 6px;
+            margin: 25px 0;
+            font-family: Consolas, monospace;
+        }
+
+        .img-fallback strong {
+            color: #4daafc;
+            font-size: 1.1em;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .container {
+                flex-direction: column;
+                margin: 20px auto;
+            }
+            aside.sidebar {
+                width: auto;
+                position: static;
+                max-height: none;
+                margin-bottom: 20px;
+            }
+            main {
+                padding: 25px;
+            }
+            .close-modal {
+                top: 10px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>More Node Shortcuts</h1>
+    <p>Documentation &amp; User Guide</p>
+</header>
+
+<div class="container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <h3>Contents</h3>
+        <ul>
+            <li><a href="#requirements">Requirements</a></li>
+            <li><a href="#installation">Installation</a></li>
+            <li><a href="#accessing-plugin">Accessing the Plugin</a></li>
+            <li><a href="#core-features">Core Features &amp; Workflow</a>
+                <ul>
+                    <li><a href="#search-add">1. Searching and Adding Nodes</a></li>
+                    <li><a href="#assigning-shortcuts">2. Assigning Shortcuts</a></li>
+                    <li><a href="#spawning-nodes">3. Spawning Nodes in Blueprints</a></li>
+                    <li><a href="#drag-pin">4. Drag-From-Pin Workflow</a></li>
+                </ul>
+            </li>
+            <li><a href="#managing-bindings">Managing Bindings</a></li>
+            <li><a href="#default-bindings">Included Default Bindings</a></li>
+            <li><a href="#troubleshooting">Troubleshooting</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main>
+        <p><strong>More Node Shortcuts</strong> is an editor plugin for Unreal Engine that drastically speeds up Blueprint workflows. It allows you to assign custom keyboard shortcuts to any Blueprint node, enabling you to spawn nodes directly into the active graph without opening the right-click context menu.</p>
+
+        <h2 id="requirements">Requirements</h2>
+        <ul class="content-list">
+            <li><strong>Engine Version:</strong> Unreal Engine 5.6</li>
+            <li><strong>Platform:</strong> Windows (Editor Build)</li>
+        </ul>
+
+        <h2 id="installation">Installation</h2>
+        <ol class="content-list">
+            <li>Place the <code>MoreNodeShortcuts</code> plugin folder inside your project's <code>Plugins</code> folder (create the folder if it doesn't exist).</li>
+            <li>Open your Unreal Engine project.</li>
+            <li>If Unreal prompts you to build missing modules, click <strong>Yes</strong> to allow the plugin to build.</li>
+            <li>Ensure the plugin is enabled by navigating to <strong>Edit &gt; Plugins</strong> and searching for "More Node Shortcuts".</li>
+        </ol>
+
+        <h2 id="accessing-plugin">Accessing the Plugin</h2>
+        <p>To open the binding manager window, navigate to the top menu bar:<br>
+        <strong>Tools &gt; More Node Shortcuts</strong></p>
+        <p>This opens the main manager window where you can search for nodes, create bindings, assign shortcuts, and review any key conflicts.</p>
+        
+        <img src="1.png" alt="Main Plugin Window" onerror="this.outerHTML='<div class=\'img-fallback\'>📸 <strong>1.png</strong> (Main Plugin Window)<br><small>Save index.html in the same folder as your images to view this.</small></div>'">
+
+        <h2 id="core-features">Core Features &amp; Workflow</h2>
+
+        <h3 id="search-add">1. Searching and Adding Nodes</h3>
+        <p>The <strong>Search Project Nodes</strong> section at the bottom of the window allows you to find and add any available Blueprint node to your shortcut list.</p>
+        <ul class="content-list">
+            <li><strong>Search Bar:</strong> Supports direct node names, partial matches, and keywords (e.g., <code>print string</code>, <code>do once</code>, <code>bool and</code>, <code>multiply</code>).</li>
+            <li><strong>Category Filter:</strong> Use the dropdown menu on the right to narrow down nodes by specific Engine or Project categories.</li>
+        </ul>
+        
+        <img src="5.png" alt="Category Filtering" onerror="this.outerHTML='<div class=\'img-fallback\'>📸 <strong>5.png</strong> (Category Filtering)<br><small>Save index.html in the same folder as your images to view this.</small></div>'">
+
+        <p>Once you find the node you want (for example, the <code>Branch</code> node), click the <strong>Add</strong> button next to it. The button will turn dark green and say <strong>Added</strong>.</p>
+        
+        <img src="2.png" alt="Adding a Node" onerror="this.outerHTML='<div class=\'img-fallback\'>📸 <strong>2.png</strong> (Adding a Node)<br><small>Save index.html in the same folder as your images to view this.</small></div>'">
+
+        <h3 id="assigning-shortcuts">2. Assigning Shortcuts</h3>
+        <p>After adding a node, it will appear in the <strong>Current Bindings</strong> list at the top. To assign a shortcut:</p>
+        <ol class="content-list">
+            <li>Click on the binding in the list to select it (it will highlight in blue).</li>
+        </ol>
+        
+        <img src="6.png" alt="Selecting a Binding" onerror="this.outerHTML='<div class=\'img-fallback\'>📸 <strong>6.png</strong> (Selecting a Binding)<br><small>Save index.html in the same folder as your images to view this.</small></div>'">
+
+        <ol start="2" class="content-list">
+            <li>Click the <strong>Capture Key For Selected Binding</strong> button.</li>
+            <li>Hold any modifier keys (Ctrl, Alt, Shift) you wish to use, and press your desired key (e.g., <code>B</code>).</li>
+        </ol>
+        
+        <p>Once assigned, the shortcut will immediately update. If successful, the Status column will display <strong style="color: #10b981;">Ready</strong> in green.</p>
+        
+        <img src="4.png" alt="Successful Binding" onerror="this.outerHTML='<div class=\'img-fallback\'>📸 <strong>4.png</strong> (Successful Binding)<br><small>Save index.html in the same folder as your images to view this.</small></div>'">
+
+        <h3 id="spawning-nodes">3. Spawning Nodes in Blueprints</h3>
+        <p>With your shortcuts assigned, you can now place nodes instantly:</p>
+        <ol class="content-list">
+            <li>Open any Blueprint graph.</li>
+            <li>Ensure the graph window is focused.</li>
+            <li><strong>Left-click</strong> in the graph while holding your assigned shortcut key combination.</li>
+        </ol>
+        
+        <div class="note">
+            <strong>Note:</strong> If multiple Blueprint editors are open, the plugin targets the most recently active one.
+        </div>
+
+        <h3 id="drag-pin">4. Drag-From-Pin Workflow (Auto-Connect)</h3>
+        <p>The plugin fully supports spawning nodes while dragging from an existing Blueprint pin or wire:</p>
+        <ol class="content-list">
+            <li>Drag a wire from an execution pin or value pin.</li>
+            <li>Trigger the shortcut for your desired node.</li>
+            <li>The plugin will spawn the node and attempt to automatically connect it to the dragged pin.</li>
+        </ol>
+        <p><em>Auto-connection depends on node compatibility and pin types (e.g., using a shortcut for a Math node while dragging from a Float pin).</em></p>
+
+        <h2 id="managing-bindings">Managing Bindings</h2>
+        <p>The <strong>Current Bindings</strong> section displays all default and custom setups. Pay attention to the <strong>Status</strong> column:</p>
+        <ul class="content-list">
+            <li><strong style="color: #10b981;">Ready (Green):</strong> The shortcut is assigned and ready to use.</li>
+            <li><strong style="color: #f59e0b;">Needs Key (Yellow):</strong> The node is in your list but has no assigned shortcut. Select it and use the Capture button to assign one.</li>
+            <li><strong style="color: #ef4444;">Conflict (Red):</strong> Multiple nodes share the exact same shortcut key. <strong>Shortcuts will not work while in conflict.</strong></li>
+        </ul>
+
+        <h2 id="default-bindings">Included Default Bindings</h2>
+        <p>To get you started, the plugin includes a set of common default bindings. Some come pre-assigned, while others are blank and waiting for your preferred key:</p>
+        <ul class="content-list">
+            <li><strong>Add Custom Event:</strong> <code>Alt + E</code></li>
+            <li><strong>Print String:</strong> <code>Alt + P</code></li>
+            <li><em>Unbound Defaults (Needs Key):</em> Actor Has Tag, Multiply, Get Actor Of Class, Get Actor Location, Keyboard Event, Spawn Actor From Class, Get Player Character, Get Player Controller, Lerp (Float/Vector/Rotator/Transform/Color).</li>
+        </ul>
+
+        <h2 id="troubleshooting">Troubleshooting</h2>
+
+        <div class="warning">
+            <strong>The shortcut is marked as a "Conflict"</strong><br>
+            If you assign a shortcut that is already in use, the row will turn red, and a warning will appear at the top of the window. Select one of the conflicting bindings, click <strong>Clear Key</strong>, and capture a new, unique key combination.
+        </div>
+        
+        <img src="3.png" alt="Conflict Warning" onerror="this.outerHTML='<div class=\'img-fallback\'>📸 <strong>3.png</strong> (Conflict Warning)<br><small>Save index.html in the same folder as your images to view this.</small></div>'">
+
+        <p><strong>The plugin opens, but shortcuts do not place nodes</strong><br>
+        Verify the following:</p>
+        <ul class="content-list">
+            <li>A Blueprint graph is currently open and the window is <strong>focused</strong>.</li>
+            <li>The binding's status is <strong>Ready</strong> (not "Needs Key" or "Conflict").</li>
+        </ul>
+
+        <p><strong>A node does not auto-connect while dragging from a pin</strong><br>
+        This usually means the pin types are incompatible with the node you are spawning, or the node does not natively support autowiring in that specific context.</p>
+
+        <p><strong>I can't find a specific node in the search</strong><br>
+        Try using fewer words or simpler keyword queries (like <code>add</code>, <code>multiply</code>, or <code>multi gate</code>). If the list is too long, use the <strong>Category</strong> dropdown to filter the results.</p>
+
+    </main>
+</div>
+
+<!-- Modal Container for Zooming Images -->
+<div id="image-modal">
+    <span class="close-modal">&times;</span>
+    <img class="modal-content" id="zoomed-image" alt="Zoomed Interface">
+</div>
+
+<!-- Scripts for Image Drag and Zoom feature -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const modal = document.getElementById("image-modal");
+        const modalImg = document.getElementById("zoomed-image");
+        const closeBtn = document.querySelector(".close-modal");
+        
+        // Find all images inside the main content area
+        const images = document.querySelectorAll("main img");
+        
+        // Drag logic variables
+        let isZoomed = false;
+        let isDragging = false;
+        let startX, startY;
+        let translateX = 0, translateY = 0;
+        let dragDistance = 0;
+
+        // Open modal when an image is clicked
+        images.forEach(img => {
+            img.addEventListener("click", function() {
+                modal.classList.add("show");
+                modalImg.src = this.src;
+                modalImg.classList.remove("zoomed"); 
+                modalImg.style.transform = "scale(1) translate(0px, 0px)";
+                isZoomed = false;
+                translateX = 0;
+                translateY = 0;
+            });
+        });
+
+        // Start dragging
+        modalImg.addEventListener("mousedown", function(e) {
+            e.preventDefault(); // Prevent default browser image drag
+            e.stopPropagation();
+            if (isZoomed) {
+                isDragging = true;
+                dragDistance = 0;
+                // Calculate starting position taking the current scale into account
+                startX = e.clientX - translateX * 2.5;
+                startY = e.clientY - translateY * 2.5;
+                this.style.transition = "none"; // Disable CSS transition for instant drag response
+            }
+        });
+
+        // Handle dragging
+        window.addEventListener("mousemove", function(e) {
+            if (isDragging && isZoomed) {
+                // Record how far the user has dragged
+                dragDistance += Math.abs(e.movementX) + Math.abs(e.movementY);
+                
+                // Update translations (divided by 2.5 to match the 1:1 scale of mouse movement)
+                translateX = (e.clientX - startX) / 2.5;
+                translateY = (e.clientY - startY) / 2.5;
+                
+                modalImg.style.transform = `scale(2.5) translate(${translateX}px, ${translateY}px)`;
+            }
+        });
+
+        // Stop dragging
+        window.addEventListener("mouseup", function(e) {
+            if (isDragging) {
+                isDragging = false;
+                modalImg.style.transition = "transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)"; // Restore smooth transition
+            }
+        });
+
+        // Click to toggle zoom in/out
+        modalImg.addEventListener("click", function(e) {
+            e.stopPropagation(); 
+            
+            // If the user just dragged the image, don't trigger the click/zoom logic
+            if (dragDistance > 5) {
+                dragDistance = 0; // Reset
+                return; 
+            }
+            
+            isZoomed = !isZoomed;
+            
+            if (isZoomed) {
+                this.classList.add("zoomed");
+                translateX = 0;
+                translateY = 0;
+                this.style.transform = `scale(2.5) translate(0px, 0px)`;
+            } else {
+                this.classList.remove("zoomed");
+                translateX = 0;
+                translateY = 0;
+                this.style.transform = `scale(1) translate(0px, 0px)`;
+            }
+        });
+
+        // Close modal function
+        function closeModal() {
+            modal.classList.remove("show");
+            isZoomed = false;
+            isDragging = false;
+            modalImg.classList.remove("zoomed");
+            modalImg.style.transform = `scale(1) translate(0px, 0px)`;
+            // Wait for fadeout before clearing the image source
+            setTimeout(() => { 
+                modalImg.src = ""; 
+            }, 300);
+        }
+
+        closeBtn.addEventListener("click", closeModal);
+        
+        // Close if clicked on the dark background
+        modal.addEventListener("click", function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close on Escape key press
+        document.addEventListener("keydown", function(e) {
+            if (e.key === "Escape" && modal.classList.contains("show")) {
+                closeModal();
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
